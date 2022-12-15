@@ -1,3 +1,32 @@
+import cv2
+
+
+def draw_boxes(source, box, label, score, color):
+    cv2.rectangle(source, box, color, 2)  # draw box
+    (label_width, label_height), _ = cv2.getTextSize(
+        f"{label} - {round(score, 2)}",
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        1,
+    )
+    cv2.rectangle(
+        source,
+        (box[0] - 1, box[1] - label_height - 6),
+        (box[0] + label_width, box[1]),
+        color,
+        -1,
+    )
+    cv2.putText(
+        source,
+        f"{label} - {round(score, 2)}",
+        (box[0], box[1] - 5),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.5,
+        [255, 255, 255],
+        1,
+    )
+
+
 def get_divable_size(imgsz, stride):
     for i in range(len(imgsz)):
         div, mod = divmod(imgsz[i], stride)
@@ -5,20 +34,6 @@ def get_divable_size(imgsz, stride):
             div += 1
         imgsz[i] = div * stride
     return imgsz
-
-
-def handle_overflow_box(box, imgsz):
-    if box[0] < 0:
-        box[0] = 0
-    elif box[0] >= imgsz[0]:
-        box[0] = imgsz[0] - 1
-    if box[1] < 0:
-        box[1] = 0
-    elif box[1] >= imgsz[1]:
-        box[1] = imgsz[1] - 1
-    box[2] = box[2] if box[0] + box[2] <= imgsz[0] else imgsz[0] - box[0]
-    box[3] = box[3] if box[1] + box[3] <= imgsz[1] else box[3] - box[1]
-    return box
 
 
 class Colors:
