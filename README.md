@@ -1,10 +1,10 @@
-# YOLOv5 Segmentation on ONNXRUNTIME
+# YOLOv5 Segmentation Python
 
 ![horse](./assets/horse.png)
 
 ---
 
-Run yolov5 segmentation model on _onnxruntime_ **without torch**!
+Run yolov5 segmentation model on _onnxruntime_ or _opencv dnn_ **without torch**!
 
 ## Usage
 
@@ -33,6 +33,14 @@ python segment.py -m <YOLOV5-SEG-ONNX-PATH> -i <IMAGE-PATH>
 ```bash
 python segment.py -m <YOLOV5-SEG-ONNX-PATH> -v 0            # webcam
                                                <VIDEO-PATH> # local video
+```
+
+## OpenCV DNN
+
+Use Opencv DNN as backend with `--dnn` arguments.
+
+```bash
+python segment.py -m <YOLOV5-SEG-ONNX-PATH> -v 0 --dnn
 ```
 
 ## Run on GPU

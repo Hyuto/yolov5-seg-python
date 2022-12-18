@@ -1,13 +1,35 @@
 from pathlib import Path
+from typing import Tuple, Iterable
+
+import numpy as np
+import numpy.typing as npt
 
 
-def check_file(path, message):
+def check_file(path: str, message: str) -> None:
+    """Check if file is exist or not.
+
+    Args:
+        path (str): File path
+        message (str): Message if file is not exist
+
+    Raises:
+        FileNotFoundError: If file is not exist
+    """
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(message)
 
 
-def get_divable_size(imgsz, stride):
+def get_divable_size(imgsz: Iterable[int], stride: int) -> Iterable[int]:
+    """Get divable image size by model stride
+
+    Args:
+        imgsz (Iterable[int]): Current image size [width, height]
+        stride (int): Model stride
+
+    Returns:
+        Divable image size by model stride
+    """
     for i in range(len(imgsz)):
         div, mod = divmod(imgsz[i], stride)
         if mod > stride / 2:
@@ -16,7 +38,18 @@ def get_divable_size(imgsz, stride):
     return imgsz
 
 
-def handle_overflow_box(box, imgsz):
+def handle_overflow_box(
+    box: npt.NDArray[np.int32], imgsz: Tuple[int, int]
+) -> npt.NDArray[np.int32]:
+    """Handle if box contain overflowing coordinate based on image size
+
+    Args:
+        box (npt.NDArray[np.int32]): box to draw [left, top, width, height]
+        imgsz (Tuple[int, int]): Current image size [width, height]
+
+    Returns:
+        Non overflowing box
+    """
     if box[0] < 0:
         box[0] = 0
     elif box[0] >= imgsz[0]:
@@ -28,22 +61,6 @@ def handle_overflow_box(box, imgsz):
     box[2] = box[2] if box[0] + box[2] <= imgsz[0] else imgsz[0] - box[0]
     box[3] = box[3] if box[1] + box[3] <= imgsz[1] else box[3] - box[1]
     return box
-
-
-def get_video_size(size, max_size):
-    if max_size == -1 or (size[0] <= max_size[0] and size[1] <= max_size[1]):
-        return list(map(lambda x: int(round(x)), size))
-
-    x_ratio, y_ratio = max_size[0] / size[0], max_size[1] / size[1]
-
-    if x_ratio < 1 and y_ratio < 1:
-        _min = min(x_ratio, y_ratio)
-        new_size = [size[0] * _min, size[1] * _min]
-    elif x_ratio < 1:
-        new_size = [max_size[0], size[1] * x_ratio]
-    else:
-        new_size = [size[0] * y_ratio, max_size[1]]
-    return list(map(lambda x: int(round(x)), new_size))
 
 
 # fmt: off

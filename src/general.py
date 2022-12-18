@@ -1,11 +1,36 @@
-import numpy as np
-import cv2
+from typing import Union
 
+import cv2
+import numpy as np
+import numpy.typing as npt
+
+from .models import ORTModelLoader, DNNModelLoader
 from .draw import draw_boxes, colors
 from .utils import get_divable_size, handle_overflow_box
 
 
-def run_yolov5_seg(model, source, conf_tresh, iou_tresh, score_tresh, topk, mask_tresh, mask_alpha):
+def run_yolov5_seg(
+    model: Union[ORTModelLoader, DNNModelLoader],
+    source: npt.NDArray[np.uint8],
+    conf_tresh: float,
+    iou_tresh: float,
+    score_tresh: float,
+    topk: int,
+    mask_tresh: float,
+    mask_alpha: float,
+) -> npt.NDArray[np.uint8]:
+    """Run YOLOv5 Segmentation model
+
+    Args:
+        model (Union[ORTModelLoader, DNNModelLoader]): Model loader
+        source (npt.NDArray[np.uint8]): Source array
+        conf_tresh (float): Confidences treshold
+        iou_tresh (float): IoU or NMS treshold
+        score_tresh (float): Scores treshold
+        topk (int): TopK classes
+        mask_tresh (float): Mask treshold
+        mask_alpha (float): Mask opacity on overlay
+    """
     source_height, source_width, _ = source.shape
 
     ## resize to divable size by stride
@@ -30,7 +55,7 @@ def run_yolov5_seg(model, source, conf_tresh, iou_tresh, score_tresh, topk, mask
         swapRB=False,
         crop=False,
     )  # normalize and resize: [h, w, 3] => [1, 3, h, w]
-    result = model(None, {"images": input_img})
+    result = model.forward(input_img)
 
     # box preprocessing
     result[0][0, :, 0] = (result[0][0, :, 0] - 0.5 * result[0][0, :, 2]) * x_ratio

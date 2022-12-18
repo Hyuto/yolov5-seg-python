@@ -1,7 +1,26 @@
+from typing import Tuple
+
 import cv2
+import numpy as np
+import numpy.typing as npt
 
 
-def draw_boxes(source, box, label, score, color):
+def draw_boxes(
+    source: npt.NDArray[np.uint8],
+    box: npt.NDArray[np.int32],
+    label: str,
+    score: float,
+    color: Tuple[int, int, int],
+) -> None:
+    """Draw boxes on images
+
+    Args:
+        source (npt.NDArray[np.uint8]): image array
+        box (npt.NDArray[np.int32]): box to draw [left, top, width, height]
+        label (str): box label
+        score (float): box score
+        color (Tuple[int, int, int]): box color in rgb format
+    """
     cv2.rectangle(source, box, color, 2)  # draw box
     (label_width, label_height), _ = cv2.getTextSize(
         f"{label} - {round(score, 2)}",
@@ -28,9 +47,9 @@ def draw_boxes(source, box, label, score, color):
 
 
 class Colors:
-    # Ultralytics color palette https://ultralytics.com/
-    def __init__(self):
-        # hex = matplotlib.colors.TABLEAU_COLORS.values()
+    """Ultralytics color palette https://ultralytics.com/"""
+
+    def __init__(self) -> None:
         hexs = (
             "FF3838",
             "FF9D97",
@@ -56,12 +75,12 @@ class Colors:
         self.palette = [self.hex2rgb(f"#{c}") for c in hexs]
         self.n = len(self.palette)
 
-    def __call__(self, i, bgr=False):
+    def __call__(self, i: int, bgr: bool = False) -> Tuple[int, int, int]:
         c = self.palette[int(i) % self.n]
         return (c[2], c[1], c[0]) if bgr else c
 
     @staticmethod
-    def hex2rgb(h):  # rgb order (PIL)
+    def hex2rgb(h: str) -> Tuple[int, int, int]:  # rgb order (PIL)
         return tuple(int(h[1 + i : 1 + i + 2], 16) for i in (0, 2, 4))
 
 

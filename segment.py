@@ -1,8 +1,9 @@
 import argparse
 
+import numpy as np
 import cv2
 
-from src.models import ModelLoader
+from src.models import ORTModelLoader, DNNModelLoader
 from src.general import run_yolov5_seg
 from src.utils import check_file
 
@@ -53,6 +54,11 @@ def parse_opt():
         default=0.4,
         help="Float representing the opacity of mask layer",
     )
+    parser.add_argument(
+        "--dnn",
+        action="store_true",
+        help="Use OpenCV DNN module [if false using onnxruntime] for backend",
+    )
 
     opt = parser.parse_args()
     if opt.image is None and opt.video is None:
@@ -62,8 +68,23 @@ def parse_opt():
     return opt
 
 
-def main(opt):
-    model = ModelLoader(opt.model)
+def main(opt) -> None:
+    if opt.dnn:
+        model = DNNModelLoader(opt.model)  # use Opencv DNN module
+    else:
+        model = ORTModelLoader(opt.model)  # use onnxruntime
+
+    # warmup model
+    _ = run_yolov5_seg(
+        model,
+        (np.random.rand(model.width, model.height, 3) * 255).astype(np.uint8),  # random image
+        opt.conf_tresh,
+        opt.iou_tresh,
+        opt.score_tresh,
+        opt.topk,
+        opt.mask_tresh,
+        opt.mask_alpha,
+    )
 
     if opt.image:
         check_file(opt.image, "Image file not found!")
