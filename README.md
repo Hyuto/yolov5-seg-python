@@ -35,6 +35,8 @@ python segment.py -m <YOLOV5-SEG-ONNX-PATH> -v 0            # webcam
                                                <VIDEO-PATH> # local video
 ```
 
+**Note** : Press `q` to stop video processing.
+
 ## OpenCV DNN
 
 Use Opencv DNN as backend with `--dnn` arguments.
@@ -45,10 +47,13 @@ python segment.py -m <YOLOV5-SEG-ONNX-PATH> -v 0 --dnn
 
 ## Run on GPU
 
-Auto using gpu to run model when devices is supported and `onnxruntime-gpu` is installed.
+Auto using gpu to run model when devices is supported.
 
-**Note** : `onnxruntime-gpu` must be installed with the same version as `onnxruntime` to be
-able to use GPU.
+- `onnxruntime` need `onnxruntime-gpu` to be installed.
+
+  **Note** : `onnxruntime-gpu` must be installed with the same version as `onnxruntime` to be able to use GPU.
+
+- `opencv-dnn` need custom build.
 
 ```bash
 pip install onnxruntime-gpu==<YOUR-ONNXRUNTIME-VERSION>
